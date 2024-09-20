@@ -27,34 +27,42 @@ const GetEmployee = async(req, res)=>{
 }
 
    const CreateEmployee = async(req , res)=>{
-    const { Name, email,mobileNumber, designation, gender, course, img}= req.body;
-      console.log (Name, email,mobileNumber, designation, gender, course, img)
+    // const { Name, email,mobileNumber, designation, gender, course, img}= req.body;
+    //   console.log (Name, email,mobileNumber, designation, gender, course, img)
 
       try {
 
         const { Name, email,mobileNumber, designation, gender, course, img}= req.body;
-        console.log (Name, email,mobileNumber, designation, gender, course, img)
-        console.log(req.user)
+        // console.log (Name, email,mobileNumber, designation, gender, course, img)
+        // console.log(req.user)
         const id = req.user._id;
-        console.log(id)
+        // console.log(id)
         const user = await User.findOne({_id :id});
         console.log(user);
-    
-if(user){
-    await User.updateOne(
-        { _id: id },
-        { $push: { Employees : { _id: new ObjectId(),
-            name :Name,
-             email :email,
-             mobileNumber : mobileNumber,
-              designation:designation,
-               gender:gender,
-                course:course,
-                 img:img
-        } }}
-      );
-      res.status(201).json({ message: "Employee successfully added !!! "});
-}
+        // const isEmployeeExists = user.Employees.some(emp => emp.name === Name || emp.email === email);
+    // if(!isEmployeeExists){
+        if(user){
+            await User.updateOne(
+                { _id: id },
+                { $push: { Employees : { _id: new ObjectId(),
+                    name :Name,
+                     email :email,
+                     mobileNumber : mobileNumber,
+                      designation:designation,
+                       gender:gender,
+                        course:course,
+                         img:img
+                } }}
+              );
+              res.status(201).json({ message: "Employee successfully added !!! "});
+        }
+    // }
+    // else{
+    //     res.status(409).json({
+    //         message: "Duplicate Name or Email !!!",
+    //        });
+    // }
+
       } catch (error) {
        // console.log(error);
        res.status(500).json({
@@ -64,12 +72,15 @@ if(user){
 
    }
 
-   const EditEmployee = async()=>{
+   const EditEmployee = async(req,res)=>{
 
-   
+    // console.log(req)
+    // const {name, email,mobileNumber, designation, gender, course, img}= req.body;
+
         try {
-            const userId = req.user._id; // The ID of the user who has the Employees array
-            const employeeId = req.params.id; // The ID of the employee to update
+            const userId = req.user._id; 
+            const employeeId = req.params.id; 
+            // console.log(userId , employeeId)
     
             // Find the user and get the specific employee's current data
             const user = await User.findOne({ _id: userId, "Employees._id": employeeId });
@@ -78,28 +89,28 @@ if(user){
                 return res.status(404).json({ message: "User or Employee not found" });
             }
     
-            // Find the specific employee in the Employees array
+         
             const employee = user.Employees.id(employeeId);
     
             // Merge the existing employee data with the new data from req.body
             const updatedEmployee = {
-                ...employee.toObject(), // Spread the current employee data
-                ...req.body // Overwrite the fields that are sent in req.body
+                ...employee.toObject(),
+                ...req.body
             };
-    
-            // Use $set with dot notation to update specific fields within the Employees array
+    // console.log(updatedEmployee)
+           
             const updatedUser = await User.findOneAndUpdate(
                 { _id: userId, "Employees._id": employeeId },
-                { $set: { "Employees.$": updatedEmployee } }, // Replace the employee with merged data
-                { new: true } // Return the updated document
+                { $set: { "Employees.$": updatedEmployee } },
+                { new: true } 
             );
-    
+    // console.log(updatedUser )
             res.status(200).json({
                 message: "Employee updated successfully",
-                updatedEmployee: updatedUser.Employees.id(employeeId) // Return updated employee
+                updatedEmployee: updatedUser.Employees.id(employeeId)
             });
         } catch (error) {
-            console.error(error);
+            // console.error(error);
             res.status(500).json({ message: "Error updating employee", error });
         }
     };    
@@ -109,7 +120,7 @@ if(user){
          try {
           const id = req.user._id;
            let searchValue = req.query.query;
-           console.log(searchValue);
+        //    console.log(searchValue);
            const capitalizeFirstLetter = (str) => {
             if (str.length === 0) return str; // handleing empty string
             return str.charAt(0).toUpperCase() + str.slice(1);

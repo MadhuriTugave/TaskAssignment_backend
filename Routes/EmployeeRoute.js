@@ -8,4 +8,5 @@ EmployeeRouter.post("/create" ,EmployeeController.CreateEmployee);
 EmployeeRouter.get("/",EmployeeController.GetEmployee);
 EmployeeRouter.delete("/:id",EmployeeController.DeleteEmployee);
 EmployeeRouter.get("/search", EmployeeController.searchResult)
+EmployeeRouter.put("/:id",EmployeeController.EditEmployee);
 module.exports = EmployeeRouter;
